@@ -6,8 +6,10 @@ vendor/
 dist/
 build/
 
-# Environment
+# Environment - never commit these
 .env
+.env.local
+config.env
 *.local
 
 # Databases
@@ -18,12 +20,12 @@ build/
 # Logs
 *.log
 logs/
+heartbeat.log
 
 # OS
 .DS_Store
 Thumbs.db
 
 # YASH specific
-memory/
-heartbeat.log
 workspace/
+memory/

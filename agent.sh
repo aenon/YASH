@@ -9,9 +9,13 @@ CONTEXT_FILE="${CONTEXT_FILE:-$SCRIPT_DIR/CONTEXT.md}"
 MEMORY_DB="${MEMORY_DB:-$SCRIPT_DIR/memory.db}"
 MAX_TOKENS="${MAX_TOKENS:-4000}"
 
-# Load config
+# Load config (supports both .env and config.env for backward compatibility)
 load_config() {
-    if [[ -f "$SCRIPT_DIR/config.env" ]]; then
+    if [[ -f "$SCRIPT_DIR/.env" ]]; then
+        set -a
+        source "$SCRIPT_DIR/.env"
+        set +a
+    elif [[ -f "$SCRIPT_DIR/config.env" ]]; then
         set -a
         source "$SCRIPT_DIR/config.env"
         set +a
