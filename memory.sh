@@ -25,18 +25,21 @@ init() {
     echo "Memory initialized at $MEMORY_DB"
 }
 
-# Store a message
+# Store a message (with proper escaping)
 store() {
     local role="$1"
     local content="$2"
-    sqlite3 "$MEMORY_DB" "INSERT INTO messages (role, content) VALUES ('$role', '$(sqlite3 "$MEMORY_DB" "SELECT '$content'")');"
+    # Escape single quotes in content by doubling them
+    local escaped_content="${content//\'/\'\'}"
+    sqlite3 "$MEMORY_DB" "INSERT INTO messages (role, content) VALUES ('$role', '$escaped_content');"
 }
 
 # Get recent messages (for context window)
 recent() {
     local limit="${1:-10}"
-    sqlite3 -json "$MEMORY_DB" "SELECT role, content FROM messages ORDER BY id DESC LIMIT $limit;" | \
-        jq -r '.[] | "\(.role): \(.content)"' | tac
+    sqlite3 "$MEMORY_DB" "SELECT role, content FROM messages ORDER BY id DESC LIMIT $limit;" | while IFS='|' read -r role content; do
+        echo "$role: $content"
+    done | tac
 }
 
 # Get all messages count
@@ -65,28 +68,40 @@ set_memory() {
 
 # Compact: summarize old messages
 compact() {
-    local keep="${1:-10}"
-    local old_messages=$(sqlite3 "$MEMORY_DB" "SELECT content FROM messages ORDER BY id ASC LIMIT 20;")
+    local count="${1:-20}"
+    
+    # Get oldest N messages
+    local old_messages
+    old_messages=$(sqlite3 "$MEMORY_DB" "SELECT id, content FROM messages ORDER BY id ASC LIMIT $count;")
     
     if [[ -z "$old_messages" ]]; then
         echo "No messages to compact"
         return
     fi
     
+    # Get the max ID we're compacting (the oldest still in the result set)
+    local max_id
+    max_id=$(echo "$old_messages" | tail -1 | cut -d'|' -f1)
+    
+    # Extract just the contents for summation
+    local contents
+    contents=$(echo "$old_messages" | cut -d'|' -f2-)
+    
     # Create summary entry
     local summary_file="$SCRIPT_DIR/memory/summaries.md"
     mkdir -p "$(dirname "$summary_file")"
-    echo -e "\n### Compaction $(date)\n$old_messages\n" >> "$summary_file"
+    echo -e "\n### Compaction $(date)\n$contents\n" >> "$summary_file"
     
-    # Delete compacted messages
-    sqlite3 "$MEMORY_DB" "DELETE FROM messages WHERE id <= (SELECT MAX(id) FROM (SELECT id FROM messages ORDER BY id ASC LIMIT 20));"
+    # Delete the compacted messages (delete all with id < max_id we kept)
+    sqlite3 "$MEMORY_DB" "DELETE FROM messages WHERE id < $max_id;"
     
-    echo "Compacted to $summary_file"
+    echo "Compacted messages up to ID $max_id to $summary_file"
 }
 
 # Count tokens (rough estimate: 4 chars ≈ 1 token)
 tokens() {
-    local text="$(recent 100 | tr -d '\n')"
+    local text
+    text=$(sqlite3 "$MEMORY_DB" "SELECT GROUP_CONCAT(content, '') FROM messages;")
     echo $(( ${#text} / 4 ))
 }
 
