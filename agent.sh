@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="${WORKSPACE_DIR:-$SCRIPT_DIR}"
 CONTEXT_FILE="${CONTEXT_FILE:-$SCRIPT_DIR/CONTEXT.md}"
-MEMORY_DB="${MEMORY_DB:-$SCRIPT_DIR/memory.db}"
+MEMORY_FILE="${MEMORY_FILE:-$SCRIPT_DIR/messages.log}"
 MAX_TOKENS="${MAX_TOKENS:-4000}"
 
 # Load config (supports both .env and config.env for backward compatibility)
@@ -94,7 +94,7 @@ run() {
     load_config
     
     # Initialize if needed
-    if [[ ! -f "$MEMORY_DB" ]]; then
+    if [[ ! -f "$MEMORY_FILE" ]]; then
         init
     fi
     
@@ -155,6 +155,20 @@ $user_input"
             bash "$SCRIPT_DIR/tui.sh" error "Failed to get response from LLM"
             continue
         }
+        
+        # Execute any EXEC: commands from response (plain or in code blocks)
+        local exec_output
+        exec_output=$(cd "$SCRIPT_DIR/workspace" && echo "$response" | grep -E "^EXEC:" | cut -c6- | while read -r cmd; do
+            eval "$cmd" 2>&1 || echo "ERROR: $cmd"
+        done)
+        
+        # If exec ran, append output to response
+        if [[ -n "$exec_output" ]]; then
+            response="$response
+
+## Executed
+$exec_output"
+        fi
         
         # Show response
         bash "$SCRIPT_DIR/tui.sh" display "$response"

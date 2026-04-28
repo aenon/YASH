@@ -9,7 +9,12 @@ prompt_user() {
         dialog --title "YASH" --inputbox "Your request:" 10 60 2>/tmp/yash_input.txt
         cat /tmp/yash_input.txt
     else
-        read -p "You: " input
+        local input
+        read -r -p "You: " input || {
+            # Ctrl-D pressed - print newline
+            echo ""
+            exit 1
+        }
         echo "$input"
     fi
 }
