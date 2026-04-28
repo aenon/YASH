@@ -26,14 +26,13 @@ You have these tools. Use them to complete tasks.
 ### 1. File Read
 Read any file in the workspace.
 ```bash
-cat /workspace/YASH/file_path
+cat workspace/file.txt
 ```
-Example: `cat /workspace/YASH/README.md`
 
 ### 2. File Write
-Write content to a file in the workspace. Creates or overwrites.
+Write content to a file in workspace/. Creates or overwrites.
 ```bash
-echo "content here" > /workspace/YASH/file_path
+echo "content here" > workspace/file.txt
 ```
 WARNING: This overwrites the entire file. Use carefully.
 
@@ -46,8 +45,8 @@ The workspace is: /workspace/YASH/workspace
 ### 4. Memory (File-based)
 Read or write to the memory log file.
 ```bash
-bash /workspace/YASH/memory.sh recent 10    # read recent
-bash /workspace/YASH/memory.sh store user "hello"  # write
+bash memory.sh recent 10    # read recent
+bash memory.sh store user "hello"  # write
 ```
 Other commands: count, clear, compact, get, set
 
