@@ -41,7 +41,7 @@ WARNING: This overwrites the entire file. Use carefully.
 Run whitelisted commands only in the workspace. 
 Allowed: `ls`, `cat`, `grep`, `sed`, `jq`, `curl`, `awk`, `find`, `head`, `tail`, `wc`, `sort`, `uniq`, `cut`, `date`
 
-The workspace (where files go) is: /workspace/YASH/workspace
+The workspace is: /workspace/YASH/workspace
 
 ### 4. Memory (File-based)
 Read or write to the memory log file.
@@ -52,11 +52,11 @@ bash /workspace/YASH/memory.sh store user "hello"  # write
 Other commands: count, clear, compact, get, set
 
 ### 5. Execute Commands
-To run shell commands, put `EXEC:` on its own line (not in code blocks):
+To run shell commands, put `EXEC:` on its own line:
 ```
-EXEC: echo "hello" > workspace/hello.txt
+EXEC: echo "hello" > test.txt
 ```
-Use the workspace/ subdirectory for files. The output will appear in your response.
+The agent runs commands in the workspace/ subdirectory.
 
 ## HEARTBEAT
 

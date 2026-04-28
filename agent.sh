@@ -158,7 +158,7 @@ $user_input"
         
         # Execute any EXEC: commands from response (plain or in code blocks)
         local exec_output
-        exec_output=$(cd "$SCRIPT_DIR" && echo "$response" | grep -E "^EXEC:" | cut -c6- | while read -r cmd; do
+        exec_output=$(cd "$SCRIPT_DIR/workspace" && echo "$response" | grep -E "^EXEC:" | cut -c6- | while read -r cmd; do
             eval "$cmd" 2>&1 || echo "ERROR: $cmd"
         done)
         
