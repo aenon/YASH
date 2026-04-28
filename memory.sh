@@ -7,7 +7,7 @@ MEMORY_FILE="${MEMORY_FILE:-$SCRIPT_DIR/messages.log}"
 
 # Initialize - create empty log
 init() {
-    touch "$MEMORY_FILE"
+    : > "$MEMORY_FILE"
     echo "Memory initialized at $MEMORY_FILE"
 }
 
