@@ -52,11 +52,11 @@ bash /workspace/YASH/memory.sh store user "hello"  # write
 Other commands: count, clear, compact, get, set
 
 ### 5. Execute Commands
-To run shell commands, prefix with `EXEC:` on its own line:
+To run shell commands, put `EXEC:` on its own line (not in code blocks):
 ```
-EXEC: echo "hello" > /workspace/YASH/test.txt
+EXEC: echo "hello" > test.txt
 ```
-The output will be appended to your response.
+Use relative paths (files in /workspace/YASH). The output will appear in your response.
 
 ## HEARTBEAT
 
