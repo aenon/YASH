@@ -41,11 +41,11 @@ bash agent.sh run
 ## Dependencies
 
 - `bash` (4+)
-- `python3` (for memory - stdlib only, no sqlite3 CLI needed)
 - `curl`
+- `awk` (for JSON parsing in memory)
 - `dialog` (optional, for TUI)
 
-Install: `sudo apt install curl dialog` (python3 usually pre-installed)
+Install: `sudo apt install curl awk dialog`
 
 ## Philosophy
 
