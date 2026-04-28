@@ -3,13 +3,53 @@
 
 set -euo pipefail
 
+# Spinner PID (global for cleanup)
+SPINNER_PID=""
+
+# Start blinking dots spinner
+start_spinner() {
+    # Don't show if already running
+    if [[ -n "$SPINNER_PID" ]] && kill -0 "$SPINNER_PID" 2>/dev/null; then
+        return
+    fi
+    
+    # Blinking dots - use carriage return to stay on same line
+    (
+        while true; do
+            printf "\r   \r"     # Spaces to clear
+            sleep 0.3
+            printf "\r.  \r"
+            sleep 0.3
+            printf "\r.. \r"
+            sleep 0.3
+            printf "\r...\r"
+            sleep 0.3
+        done
+    ) &
+    SPINNER_PID=$!
+}
+
+# Stop spinner and print newline
+stop_spinner() {
+    if [[ -n "$SPINNER_PID" ]]; then
+        kill "$SPINNER_PID" 2>/dev/null || true
+        SPINNER_PID=""
+        echo ""  # Newline after spinner
+    fi
+}
+
 # Try dialog, fall back to read
 prompt_user() {
     if command -v dialog >/dev/null 2>&1; then
         dialog --title "YASH" --inputbox "Your request:" 10 60 2>/tmp/yash_input.txt
         cat /tmp/yash_input.txt
     else
-        read -p "You: " input
+        local input
+        read -r -p "You: " input || {
+            # Ctrl-D pressed - print newline
+            echo ""
+            exit 1
+        }
         echo "$input"
     fi
 }
@@ -36,5 +76,7 @@ case "${1:-}" in
     prompt) prompt_user ;;
     display) shift; display_msg "$*" ;;
     error) shift; display_error "$*" ;;
-    *) echo "Usage: $0 {prompt|display <msg>|error <msg>}"
+    spinner) start_spinner ;;
+    stop) stop_spinner ;;
+    *) echo "Usage: $0 {prompt|display <msg>|error <msg>|spinner|stop}"
 esac
