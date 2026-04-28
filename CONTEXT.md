@@ -51,6 +51,13 @@ bash /workspace/YASH/memory.sh store user "hello"  # write
 ```
 Other commands: count, clear, compact, get, set
 
+### 5. Execute Commands
+To run shell commands, prefix with `EXEC:` on its own line:
+```
+EXEC: echo "hello" > /workspace/YASH/test.txt
+```
+The output will be appended to your response.
+
 ## HEARTBEAT
 
 The agent runs a heartbeat every 30 seconds to stay alive.

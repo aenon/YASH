@@ -156,6 +156,20 @@ $user_input"
             continue
         }
         
+        # Execute any EXEC: commands from response
+        local exec_output
+        exec_output=$(echo "$response" | grep -E "^EXEC:" | cut -c6- | while read -r cmd; do
+            eval "$cmd" 2>&1 || echo "ERROR: $cmd"
+        done)
+        
+        # If exec ran, append output to response
+        if [[ -n "$exec_output" ]]; then
+            response="$response
+
+## Executed
+$exec_output"
+        fi
+        
         # Show response
         bash "$SCRIPT_DIR/tui.sh" display "$response"
         
