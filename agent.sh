@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="${WORKSPACE_DIR:-$SCRIPT_DIR}"
 CONTEXT_FILE="${CONTEXT_FILE:-$SCRIPT_DIR/CONTEXT.md}"
-MEMORY_DB="${MEMORY_DB:-$SCRIPT_DIR/memory.db}"
+MEMORY_FILE="${MEMORY_FILE:-$SCRIPT_DIR/messages.log}"
 MAX_TOKENS="${MAX_TOKENS:-4000}"
 
 # Load config (supports both .env and config.env for backward compatibility)
@@ -94,7 +94,7 @@ run() {
     load_config
     
     # Initialize if needed
-    if [[ ! -f "$MEMORY_DB" ]]; then
+    if [[ ! -f "$MEMORY_FILE" ]]; then
         init
     fi
     
