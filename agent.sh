@@ -151,18 +151,10 @@ $user_input"
         
         # Call LLM
         local response
-        
-        # Start spinner (show waiting)
-        bash "$SCRIPT_DIR/tui.sh" spinner
-        
         response=$(call_llm "" "$full_prompt") || {
-            bash "$SCRIPT_DIR/tui.sh" stop
             bash "$SCRIPT_DIR/tui.sh" error "Failed to get response from LLM"
             continue
         }
-        
-        # Stop spinner (will print newline)
-        bash "$SCRIPT_DIR/tui.sh" stop
         
         # Show response
         bash "$SCRIPT_DIR/tui.sh" display "$response"
