@@ -3,13 +3,15 @@
 
 set -euo pipefail
 
-# Spinner PID (global for cleanup)
-SPINNER_PID=""
+SPINNER_FILE="/tmp/yash_spinner.pid"
 
 # Start blinking dots spinner
 start_spinner() {
+    local current_pid
+    current_pid=$(cat "$SPINNER_FILE" 2>/dev/null)
+    
     # Don't show if already running
-    if [[ -n "$SPINNER_PID" ]] && kill -0 "$SPINNER_PID" 2>/dev/null; then
+    if [[ -n "$current_pid" ]] && kill -0 "$current_pid" 2>/dev/null; then
         return
     fi
     
@@ -26,14 +28,17 @@ start_spinner() {
             sleep 0.3
         done
     ) &
-    SPINNER_PID=$!
+    echo $! > "$SPINNER_FILE"
 }
 
 # Stop spinner and print newline
 stop_spinner() {
-    if [[ -n "$SPINNER_PID" ]]; then
-        kill "$SPINNER_PID" 2>/dev/null || true
-        SPINNER_PID=""
+    local current_pid
+    current_pid=$(cat "$SPINNER_FILE" 2>/dev/null)
+    
+    if [[ -n "$current_pid" ]]; then
+        kill "$current_pid" 2>/dev/null || true
+        rm -f "$SPINNER_FILE"
         echo ""  # Newline after spinner
     fi
 }
