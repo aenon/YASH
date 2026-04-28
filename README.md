@@ -42,10 +42,11 @@ bash agent.sh run
 
 - `bash` (4+)
 - `curl`
-- `awk` (for JSON parsing in memory)
+- `awk`
+- `jq` (optional)
 - `dialog` (optional, for TUI)
 
-Install: `sudo apt install curl awk dialog`
+Install: `sudo apt install curl awk jq dialog`
 
 ## Philosophy
 

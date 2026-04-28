@@ -68,16 +68,18 @@ Constrained to workspace directory only.
 ### 3. Command Execution
 Run whitelisted commands only. No destructive operations.
 ```bash
-COMMAND_WHITELIST="ls cat grep sed jq curl sqlite3"
+COMMAND_WHITELIST="ls cat grep sed jq curl awk"
 # Must match whitelist before execution
 ```
 
-### 4. SQLite Read/Write
-Query or modify the SQLite memory database.
+### 4. File-based Memory
+
 ```bash
-sqlite3 /workspace/TOOL/memory.buff "SQL_STATEMENT"
+bash memory.sh recent 10    # read recent
+bash memory.sh store user "hello"  # write
+bash memory.sh count      # count messages
+bash memory.sh clear     # clear session
 ```
-Supports: SELECT for reads, INSERT/UPDATE for writes.
 
 ## HEARTBEAT
 [Heartbeat schedule and health checks]
@@ -146,7 +148,7 @@ HEARTBEAT_INTERVAL=30
 
 ```bash
 # Install dependencies
-sudo apt install curl jq sqlite3 dialog
+sudo apt install curl awk jq dialog
 
 # Initialize
 bash memory.sh init

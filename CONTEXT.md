@@ -39,18 +39,17 @@ WARNING: This overwrites the entire file. Use carefully.
 
 ### 3. Command Execution
 Run whitelisted commands only in the workspace. 
-Allowed: `ls`, `cat`, `grep`, `sed`, `jq`, `curl`, `sqlite3`, `find`, `head`, `tail`, `wc`, `sort`, `uniq`, `cut`, `awk`, `date`
+Allowed: `ls`, `cat`, `grep`, `sed`, `jq`, `curl`, `awk`, `find`, `head`, `tail`, `wc`, `sort`, `uniq`, `cut`, `date`
 
 The workspace is: /workspace/YASH
 
-### 4. SQLite Read/Write
-Query or modify the memory database.
+### 4. Memory (File-based)
+Read or write to the memory log file.
 ```bash
-sqlite3 /workspace/YASH/memory.db "SQL_STATEMENT"
+bash /workspace/YASH/memory.sh recent 10    # read recent
+bash /workspace/YASH/memory.sh store user "hello"  # write
 ```
-Examples:
-- Read: `SELECT role, content FROM messages ORDER BY id DESC LIMIT 10;`
-- Write: `INSERT INTO messages (role, content) VALUES ('user', 'hello');`
+Other commands: count, clear, compact, get, set
 
 ## HEARTBEAT
 
@@ -59,15 +58,16 @@ When the user enters "reset" or "./agent.sh reset", clear all conversation histo
 
 ## Memory
 
-- Conversation history is stored in SQLite at /workspace/YASH/memory.db
-- When approaching token limits, older messages are summarized and externalized to /workspace/YASH/memory/summaries.md
+- Conversation history is stored in messages.log (JSON lines)
+- Long-term memory in memory_<key> files
+- When approaching token limits, older messages are summarized to memory/summaries.md
 - Always load recent context before responding
 
 ## Workflow
 
 1. Load CONTEXT.md (this file)
-2. Load recent conversation from SQLite
+2. Load recent conversation from memory.sh
 3. Process user request
 4. Use tools as needed
 5. Respond to user
-6. Store interaction to SQLite
+6. Store interaction to memory.sh
